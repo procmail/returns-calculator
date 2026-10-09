@@ -64,7 +64,7 @@
         }
         .tooltip-text {
             visibility: hidden;
-            width: 220px;
+            width: 240px;
             background-color: #1F2937;
             color: #F3F4F6;
             text-align: left;
@@ -74,11 +74,13 @@
             z-index: 50;
             bottom: 125%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(calc(-50% + var(--tt-shift, 0px)));
             opacity: 0;
             transition: opacity 0.2s;
-            font-size: 10px;
-            line-height: 1.4;
+            font-size: 12px;
+            line-height: 1.45;
+            text-transform: none;
+            letter-spacing: normal;
             font-weight: 500;
             border: 1px solid #374151;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
@@ -89,15 +91,35 @@
             content: "";
             position: absolute;
             top: 100%;
-            left: 50%;
+            left: calc(50% - var(--tt-shift, 0px));
             margin-left: -5px;
             border-width: 5px;
             border-style: solid;
             border-color: #1F2937 transparent transparent transparent;
         }
-        .tooltip-container:hover .tooltip-text {
+        /* Hover only where a real pointer exists; touch screens open tooltips by tap */
+        @media (hover: hover) {
+            .tooltip-container:hover .tooltip-text {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+        .tooltip-container.tt-open .tooltip-text,
+        .tooltip-container:focus-visible .tooltip-text {
             visibility: visible;
             opacity: 1;
+        }
+        .tooltip-container:focus { outline: none; }
+        .tooltip-container:focus-visible svg { color: #D1D5DB; }
+        /* Flip below the icon when there's no room above */
+        .tooltip-container.tt-below .tooltip-text {
+            bottom: auto;
+            top: 125%;
+        }
+        .tooltip-container.tt-below .tooltip-text::after {
+            top: auto;
+            bottom: 100%;
+            border-color: transparent transparent #1F2937 transparent;
         }
     </style>
 </head>
@@ -124,7 +146,14 @@
             </div>
         </header>
 
+        <!-- Tabs -->
+        <nav class="grid grid-cols-2 bg-gray-800/80 p-1 rounded-xl border border-gray-700/60" role="tablist" aria-label="Calculator views">
+            <button id="tabBtnProjection" role="tab" aria-selected="true" aria-controls="tabProjection" onclick="setTab('projection')" class="tab-btn py-2 text-xs font-bold rounded-lg transition-all text-white bg-accentBlue">Projection</button>
+            <button id="tabBtnMonteCarlo" role="tab" aria-selected="false" aria-controls="tabMonteCarlo" onclick="setTab('montecarlo')" class="tab-btn py-2 text-xs font-bold rounded-lg transition-all text-gray-400 hover:text-white">Monte Carlo</button>
+        </nav>
 
+        <!-- PROJECTION TAB -->
+        <div id="tabProjection" role="tabpanel" aria-labelledby="tabBtnProjection" class="space-y-6">
 
         <!-- Main Quick Projection Grid -->
         <section class="grid grid-cols-3 gap-3">
@@ -185,7 +214,7 @@
                             <label for="durationMonths" class="block text-xs font-medium text-gray-400">Compounding Duration</label>
                             <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span class="tooltip-text">Total time period for this projection. <br><strong>Example:</strong> Select 12 Months to model a 1-year timeline.</span>
+                                <span class="tooltip-text">How far ahead to project. Today&#39;s balance is your starting point, so growth is counted from tomorrow. <br><strong>Example:</strong> 12 Months projects to the same date next year.</span>
                             </span>
                         </div>
                         <span id="durationVal" class="text-xs font-bold text-accentBlue">12 Months (1 Year)</span>
@@ -256,15 +285,18 @@
                 <div id="pureInputsGroup" class="col-span-2 space-y-3">
                     <div class="space-y-1.5">
                         <div class="flex items-center">
-                            <label for="returnBasis" class="block text-xs font-medium text-gray-400">Return Rate Basis</label>
+                            <label for="returnBasis" class="block text-xs font-medium text-gray-400">Return Rate Per</label>
                             <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span class="tooltip-text">Choose whether you specify your returns on a Daily basis or matching the Compounding Frequency (e.g. Weekly, Monthly).</span>
+                                <span class="tooltip-text">The time period your return figure covers. Pick whatever matches how you think about your results, e.g. "1% a day" or "5% a month". This is separate from how often gains are reinvested (Compounding Frequency below).</span>
                             </span>
                         </div>
                         <select id="returnBasis" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-2.5 px-3 text-white text-xs font-semibold focus:outline-none focus:border-accentBlue focus:ring-1 focus:ring-accentBlue/20 transition-all">
-                            <option value="daily" selected>Daily Rate</option>
-                            <option value="frequency">Match Compounding Frequency</option>
+                            <option value="daily" selected>Trading Day</option>
+                            <option value="weekly">Week</option>
+                            <option value="monthly">Month</option>
+                            <option value="quarterly">Quarter</option>
+                            <option value="annually">Year</option>
                         </select>
                     </div>
 
@@ -502,6 +534,279 @@
                 <!-- Dynamically populated month cards go here -->
             </div>
         </section>
+
+        </div>
+
+        <!-- MONTE CARLO TAB -->
+        <div id="tabMonteCarlo" role="tabpanel" aria-labelledby="tabBtnMonteCarlo" class="space-y-6 hidden">
+
+            <!-- Explainer -->
+            <section class="bg-accentBlue/5 border border-accentBlue/20 rounded-2xl p-4 space-y-1.5">
+                <h2 class="text-xs font-bold text-accentBlue uppercase tracking-widest">What is Monte Carlo?</h2>
+                <p class="text-xs text-gray-300 leading-relaxed">Real trading never follows a smooth line. Even a winning strategy has streaks of wins and streaks of losses. This tab plays out your strategy <strong id="mcSimsText" class="text-white">1,000</strong> times, each with its own random order of wins and losses, then shows the spread of results: an unlucky run, a typical run and a lucky run, plus how deep the dips get along the way.</p>
+            </section>
+
+            <!-- Outcome cards -->
+            <section class="grid grid-cols-3 gap-3">
+                <div class="bg-darkCard/60 border border-darkBorder/60 rounded-2xl p-3.5 text-center shadow-md">
+                    <div class="flex items-center justify-center mb-0.5">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Unlucky</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">1 in 10 simulated runs ended at or below this. A realistic bad stretch for this strategy, not the absolute worst case.</span>
+                        </span>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mb-1.5">10th percentile</p>
+                    <div id="mcP10" class="text-sm font-extrabold text-white">$0.00</div>
+                    <span id="mcP10Delta" class="text-[11px] text-emerald-400 font-semibold block mt-0.5">+0.00%</span>
+                </div>
+                <div class="bg-darkCard/60 border border-darkBorder/60 rounded-2xl p-3.5 text-center shadow-md">
+                    <div class="flex items-center justify-center mb-0.5">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Typical</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">The middle result: half the runs did better, half did worse. This is the best single number to plan around.</span>
+                        </span>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mb-1.5">Median</p>
+                    <div id="mcP50" class="text-sm font-extrabold text-white">$0.00</div>
+                    <span id="mcP50Delta" class="text-[11px] text-emerald-400 font-semibold block mt-0.5">+0.00%</span>
+                </div>
+                <div class="bg-darkCard/60 border border-darkBorder/60 rounded-2xl p-3.5 text-center shadow-md">
+                    <div class="flex items-center justify-center mb-0.5">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Lucky</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">Only 1 in 10 runs did better than this. Nice if it happens, but don&#39;t count on it.</span>
+                        </span>
+                    </div>
+                    <p class="text-[9px] text-gray-500 mb-1.5">90th percentile</p>
+                    <div id="mcP90" class="text-sm font-extrabold text-white">$0.00</div>
+                    <span id="mcP90Delta" class="text-[11px] text-emerald-400 font-semibold block mt-0.5">+0.00%</span>
+                </div>
+            </section>
+
+            <!-- Strategy inputs -->
+            <section class="bg-darkCard rounded-2xl p-5 border border-darkBorder shadow-lg space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Strategy</h2>
+                    <button onclick="rerunMonteCarlo()" class="text-[10px] bg-accentBlue/10 hover:bg-accentBlue/20 text-accentBlue font-bold px-2 py-1 rounded border border-accentBlue/20 transition-all">🎲 Re-run</button>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5 col-span-2">
+                        <div class="flex items-center">
+                            <label for="mcCapital" class="block text-xs font-medium text-gray-400">Starting Capital ($)</label>
+                            <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-text">The money in your account on day one.</span>
+                            </span>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute left-3.5 top-3.5 text-gray-500 font-semibold text-sm">$</span>
+                        <input type="number" id="mcCapital" value="10000" step="100" min="0" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 pl-8 pr-4 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <div class="flex items-center">
+                            <label for="mcWinRate" class="block text-xs font-medium text-gray-400">Win Rate (%)</label>
+                            <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-text">Out of 100 trades, how many make money. <br><strong>Example:</strong> 55% means 55 winners and 45 losers.</span>
+                            </span>
+                        </div>
+                        <div class="relative">
+                            <input type="number" id="mcWinRate" value="50" step="0.5" min="0" max="100" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                        <span class="absolute right-3.5 top-3.5 text-gray-500 font-semibold text-sm">%</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <div class="flex items-center">
+                            <label for="mcAvgWin" class="block text-xs font-medium text-gray-400">Avg Win (%)</label>
+                            <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-text">How much a winning trade adds, as a % of your account at that moment. <br><strong>Example:</strong> 2% of $10,000 = +$200.</span>
+                            </span>
+                        </div>
+                        <div class="relative">
+                            <input type="number" id="mcAvgWin" value="2.0" step="0.1" min="0" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                        <span class="absolute right-3.5 top-3.5 text-emerald-500 font-semibold text-sm">%</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <div class="flex items-center">
+                            <label for="mcAvgLoss" class="block text-xs font-medium text-gray-400">Avg Loss (%)</label>
+                            <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-text">How much a losing trade takes away, as a % of your account at that moment. <br><strong>Example:</strong> 1% of $10,000 = -$100.</span>
+                            </span>
+                        </div>
+                        <div class="relative">
+                            <input type="number" id="mcAvgLoss" value="1.0" step="0.1" min="0" max="100" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                        <span class="absolute right-3.5 top-3.5 text-lossRed font-semibold text-sm">%</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        <div class="flex items-center">
+                            <label for="mcTradesPerMonth" class="block text-xs font-medium text-gray-400">Trades / Month</label>
+                            <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-text">How many trades you take in a month. A month has about 21 trading days, so 21 is roughly one trade a day.</span>
+                            </span>
+                        </div>
+                        <div class="relative">
+                            <input type="number" id="mcTradesPerMonth" value="21" step="1" min="1" max="100" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="col-span-2 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <label for="mcDuration" class="block text-xs font-medium text-gray-400">Duration</label>
+                                <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="tooltip-text">How far into the future to play out each run.</span>
+                                </span>
+                            </div>
+                            <span id="mcDurationVal" class="text-xs font-bold text-accentBlue">12 Months (1 Year)</span>
+                        </div>
+                        <input type="range" id="mcDuration" min="1" max="60" value="12" class="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-accentBlue">
+                        <div class="grid grid-cols-5 gap-1.5">
+                                <button type="button" onclick="setMcDurationPreset(3)" class="mc-duration-preset-btn bg-gray-800/60 hover:bg-gray-800 text-[10px] py-1 px-1.5 rounded-md font-semibold text-gray-400 border border-transparent transition-all">3M</button>
+                                <button type="button" onclick="setMcDurationPreset(6)" class="mc-duration-preset-btn bg-gray-800/60 hover:bg-gray-800 text-[10px] py-1 px-1.5 rounded-md font-semibold text-gray-400 border border-transparent transition-all">6M</button>
+                                <button type="button" onclick="setMcDurationPreset(12)" class="mc-duration-preset-btn bg-gray-800/60 hover:bg-gray-800 text-[10px] py-1 px-1.5 rounded-md font-semibold text-gray-400 border border-transparent transition-all">1Y</button>
+                                <button type="button" onclick="setMcDurationPreset(24)" class="mc-duration-preset-btn bg-gray-800/60 hover:bg-gray-800 text-[10px] py-1 px-1.5 rounded-md font-semibold text-gray-400 border border-transparent transition-all">2Y</button>
+                                <button type="button" onclick="setMcDurationPreset(60)" class="mc-duration-preset-btn bg-gray-800/60 hover:bg-gray-800 text-[10px] py-1 px-1.5 rounded-md font-semibold text-gray-400 border border-transparent transition-all">5Y</button>
+                        </div>
+                    </div>
+
+                    <!-- Simulations -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center">
+                            <label for="mcSims" class="block text-xs font-medium text-gray-400">Simulations</label>
+                            <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="tooltip-text">How many different futures to play out. More runs give steadier numbers but take a moment longer.</span>
+                            </span>
+                        </div>
+                        <select id="mcSims" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3 text-white text-sm font-bold focus:outline-none focus:border-accentBlue focus:ring-1 focus:ring-accentBlue/20 transition-all">
+                            <option value="500">500 runs</option>
+                            <option value="1000" selected>1,000 runs</option>
+                            <option value="2000">2,000 runs</option>
+                            <option value="5000">5,000 runs</option>
+                        </select>
+                    </div>
+
+                    <!-- Ruin level -->
+                    <div class="space-y-1.5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <label for="mcRuin" class="block text-xs font-medium text-gray-400">Ruin Level</label>
+                                <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span class="tooltip-text">The loss you would treat as a disaster. <br><strong>Example:</strong> 50% means your account drops to half of your starting capital at any point.</span>
+                                </span>
+                            </div>
+                            <span id="mcRuinVal" class="text-xs font-bold text-lossRed">-50%</span>
+                        </div>
+                        <input type="range" id="mcRuin" min="10" max="90" value="50" step="5" class="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-lossRed mt-4">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Fan chart -->
+            <section class="bg-darkCard rounded-2xl p-4 border border-darkBorder shadow-lg space-y-3">
+                <div class="flex items-center">
+                    <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Balance Range Over Time</h2>
+                    <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="tooltip-text">Where the runs stood at the end of each month. The line is the typical run. The darker band holds the middle half of runs; the lighter band holds 8 out of 10. Hover or tap the chart to read the values.</span>
+                    </span>
+                </div>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] text-gray-400">
+                    <span class="flex items-center"><span class="inline-block w-4 h-0.5 rounded bg-emerald-400 mr-1.5"></span>Typical</span>
+                    <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-sm bg-emerald-400/30 mr-1.5"></span>Middle 50%</span>
+                    <span class="flex items-center"><span class="inline-block w-3 h-3 rounded-sm bg-emerald-400/10 border border-emerald-400/20 mr-1.5"></span>8 in 10 runs</span>
+                    <span class="flex items-center"><span class="inline-block w-4 h-px bg-gray-500 mr-1.5"></span>Starting capital</span>
+                </div>
+                <div id="mcChart" class="relative w-full outline-none focus-visible:ring-2 focus-visible:ring-accentBlue/40 rounded-lg" tabindex="0" aria-label="Balance range chart. Use left and right arrow keys to read each month."></div>
+                <details class="text-xs">
+                    <summary class="text-[10px] text-gray-400 font-semibold cursor-pointer select-none">Show as table</summary>
+                    <div id="mcTable" class="mt-2 max-h-64 overflow-y-auto"></div>
+                </details>
+            </section>
+
+            <!-- Risk stats -->
+            <section class="grid grid-cols-2 gap-3">
+                <div class="bg-darkCard border border-darkBorder rounded-2xl p-3.5">
+                    <div class="flex items-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Chance of Profit</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">The share of runs that finished above your starting capital.</span>
+                        </span>
+                    </div>
+                    <div id="mcProfitChance" class="text-lg font-extrabold text-white mt-1">-</div>
+                    <p id="mcProfitChanceSub" class="text-[10px] text-gray-500"></p>
+                </div>
+                <div class="bg-darkCard border border-darkBorder rounded-2xl p-3.5">
+                    <div class="flex items-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Average Outcome</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">The mean of all runs. It is usually higher than the typical result because a few very lucky runs pull it up, so don&#39;t plan around it.</span>
+                        </span>
+                    </div>
+                    <div id="mcMean" class="text-lg font-extrabold text-white mt-1">-</div>
+                    <p id="mcMeanSub" class="text-[10px] text-gray-500"></p>
+                </div>
+                <div class="bg-darkCard border border-darkBorder rounded-2xl p-3.5">
+                    <div class="flex items-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Risk of Ruin</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">The share of runs where your account fell to the ruin level at some point, even if it recovered later.</span>
+                        </span>
+                    </div>
+                    <div id="mcRuinChance" class="text-lg font-extrabold text-white mt-1">-</div>
+                    <p id="mcRuinChanceSub" class="text-[10px] text-gray-500"></p>
+                </div>
+                <div class="bg-darkCard border border-darkBorder rounded-2xl p-3.5">
+                    <div class="flex items-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Losing Streak</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">The longest run of losing trades in a row in a typical run. Expect to sit through a streak like this at some point.</span>
+                        </span>
+                    </div>
+                    <div id="mcLosingStreak" class="text-lg font-extrabold text-white mt-1">-</div>
+                    <p id="mcLosingStreakSub" class="text-[10px] text-gray-500"></p>
+                </div>
+                <div class="bg-darkCard border border-darkBorder rounded-2xl p-3.5">
+                    <div class="flex items-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Typical Drawdown</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">The biggest drop from a high point to a later low point in a typical run. <br><strong>Example:</strong> 20% means at some point you were 20% below your best balance so far.</span>
+                        </span>
+                    </div>
+                    <div id="mcDrawdown" class="text-lg font-extrabold text-white mt-1">-</div>
+                    <p id="mcDrawdownSub" class="text-[10px] text-gray-500"></p>
+                </div>
+                <div class="bg-darkCard border border-darkBorder rounded-2xl p-3.5">
+                    <div class="flex items-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Bad-Case Drawdown</p>
+                        <span class="tooltip-container ml-1 cursor-help text-gray-500 hover:text-gray-300">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span class="tooltip-text">1 in 10 runs had a drop at least this deep. Ask yourself whether you would keep following the strategy through it.</span>
+                        </span>
+                    </div>
+                    <div id="mcDrawdownBad" class="text-lg font-extrabold text-white mt-1">-</div>
+                    <p id="mcDrawdownBadSub" class="text-[10px] text-gray-500"></p>
+                </div>
+            </section>
+            <p class="text-[10px] text-gray-500 leading-relaxed px-1">Each run assumes every win and loss is exactly your average size and that trades don&#39;t affect each other. All profits stay in the account. Real results vary more than this.</p>
+        </div>
         
         <footer class="text-center text-[10px] text-gray-600 font-medium pt-4">
             Returns Calculator &copy; 2026. Made for professional traders.
@@ -731,6 +1036,24 @@
             }).format(val);
         }
 
+        function formatCompactUSD(val) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                notation: 'compact',
+                maximumFractionDigits: 1
+            }).format(val);
+        }
+
+        function formatDurationLabel(months) {
+            const years = Math.floor(months / 12);
+            const remainingMonths = months % 12;
+            if (years === 0) return `${months} Month${months > 1 ? 's' : ''}`;
+            const yearPart = `${years} Year${years > 1 ? 's' : ''}`;
+            const monthPart = remainingMonths > 0 ? `, ${remainingMonths} Mo${remainingMonths > 1 ? 's' : ''}` : '';
+            return `${months} Months (${yearPart}${monthPart})`;
+        }
+
         function formatPercent(val) {
             const prefix = val >= 0 ? '+' : '';
             return `${prefix}${val.toFixed(2)}%`;
@@ -822,7 +1145,8 @@
             }
 
             const compoundFreq = document.getElementById('compoundFreq').value;
-            const returnBasis = document.getElementById('returnBasis').value;
+            // Period the pure return figure covers (independent of compounding frequency)
+            const ratePeriod = document.getElementById('returnBasis').value;
 
             // Update Compound Growth helper text
             const compoundHelperTextEl = document.getElementById('compoundHelperText');
@@ -843,34 +1167,18 @@
             const labelEl = document.getElementById('pureReturnLabel');
             const tooltipEl = document.getElementById('pureReturnTooltip');
             if (labelEl && tooltipEl) {
-                if (returnBasis === 'daily') {
+                if (ratePeriod === 'daily') {
                     labelEl.textContent = "Pure Return Per Day (%)";
-                    tooltipEl.innerHTML = "Fixed percentage return generated per active trading day.<br><br><strong>Example (Daily Basis):</strong> If set to 1.0%, you make exactly 1.0% on each active day. This simple return accumulates daily and only compounds at the end of your selected frequency (e.g. Weekly, Monthly).";
+                    tooltipEl.innerHTML = "How much your account grows on each trading day. <br><strong>Example:</strong> 1% on $10,000 = +$100 on the first day.";
                 } else {
-                    let freqLabel = "Day";
-                    let freqDesc = "day";
-                    if (compoundFreq === 'weekly') { freqLabel = "Week"; freqDesc = "week"; }
-                    else if (compoundFreq === 'monthly') { freqLabel = "Month"; freqDesc = "month"; }
-                    else if (compoundFreq === 'quarterly') { freqLabel = "Quarter"; freqDesc = "quarter"; }
-                    else if (compoundFreq === 'annually') { freqLabel = "Year"; freqDesc = "year"; }
-                    
-                    labelEl.textContent = `Pure Return Per ${freqLabel} (%)`;
-                    tooltipEl.innerHTML = `Fixed percentage return generated per compounding ${freqDesc}.<br><br><strong>Example (${freqLabel} Basis):</strong> If you input 5.0% and there are 5 active trading days in that ${freqDesc}, each active day earns a distributed 1.0% (5.0% / 5 days). This daily rate is then accumulated and rolled into your principal at the compounding period's end.`;
+                    const periodWord = { weekly: 'week', monthly: 'month', quarterly: 'quarter', annually: 'year' }[ratePeriod];
+                    labelEl.textContent = `Pure Return Per ${periodWord[0].toUpperCase()}${periodWord.slice(1)} (%)`;
+                    tooltipEl.innerHTML = `Your return for a whole ${periodWord}. It is split evenly across that ${periodWord}&#39;s trading days. <br><strong>Example:</strong> 5% over a ${periodWord} with 20 trading days = 0.25% a day. Compounding more often than once a ${periodWord} lifts the ${periodWord} slightly above 5%, because gains start earning sooner.`;
                 }
             }
 
             const durationMonths = parseInt(document.getElementById('durationMonths').value) || 12;
-            
-            // Update duration label in UI
-            const years = Math.floor(durationMonths / 12);
-            const remainingMonths = durationMonths % 12;
-            let durationLabel = `${durationMonths} Month${durationMonths > 1 ? 's' : ''}`;
-            if (years > 0) {
-                const yearPart = `${years} Year${years > 1 ? 's' : ''}`;
-                const monthPart = remainingMonths > 0 ? `, ${remainingMonths} Mo${remainingMonths > 1 ? 's' : ''}` : '';
-                durationLabel = `${durationMonths} Months (${yearPart}${monthPart})`;
-            }
-            document.getElementById('durationVal').textContent = durationLabel;
+            document.getElementById('durationVal').textContent = formatDurationLabel(durationMonths);
 
             const scheduleTitleEl = document.getElementById('scheduleTitle');
             if (scheduleTitleEl) {
@@ -880,25 +1188,28 @@
             // Calculate daily calendar and populate month-by-month view
             const scheduleContainer = document.getElementById('monthlySchedule');
 
-            // Timeline: starts today and runs exactly N calendar months (end date exclusive)
+            // Timeline: today's balance is the starting capital and growth is counted from
+            // tomorrow through the same date N months later (inclusive).
             const now = new Date();
-            const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const endDate = addMonths(startDate, durationMonths);
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const startDate = new Date(today);
+            startDate.setDate(startDate.getDate() + 1);
+            const endDate = addMonths(today, durationMonths);
 
-            // Headline projection dates. Each card shows the balance at the start of its date,
+            // Headline projection dates. Each card shows the balance at the end of its date,
             // so the 3-month card matches the final balance of a 3-month duration.
-            const date30 = new Date(startDate);
+            const date30 = new Date(today);
             date30.setDate(date30.getDate() + 30);
-            const date3m = addMonths(startDate, 3);
-            const date6m = addMonths(startDate, 6);
+            const date3m = addMonths(today, 3);
+            const date6m = addMonths(today, 6);
 
             // Simulate far enough to cover both the schedule and every headline projection
-            const simEnd = endDate > date6m ? endDate : date6m;
+            const lastSimDate = endDate > date6m ? endDate : date6m;
             
             // Create list of calendar months covered by the schedule
             const monthsData = [];
             const monthsByKey = {};
-            for (let m = new Date(startDate.getFullYear(), startDate.getMonth(), 1); m < endDate; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
+            for (let m = new Date(startDate.getFullYear(), startDate.getMonth(), 1); m <= endDate; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
                 const monthObj = {
                     year: m.getFullYear(),
                     month: m.getMonth(), // 0-indexed
@@ -922,13 +1233,11 @@
             // including days before today and after the end, so a partial first or last period
             // earns only its pro-rata share of a per-period return.
             const periodTradingDays = {};
-            const lastSimDate = new Date(simEnd);
-            lastSimDate.setDate(lastSimDate.getDate() - 1);
-            const lastPeriodKey = getPeriodKey(lastSimDate, compoundFreq);
-            const scanSimDate = getPeriodStart(startDate, compoundFreq);
-            while (scanSimDate < simEnd || getPeriodKey(scanSimDate, compoundFreq) === lastPeriodKey) {
+            const lastPeriodKey = getPeriodKey(lastSimDate, ratePeriod);
+            const scanSimDate = getPeriodStart(startDate, ratePeriod);
+            while (scanSimDate <= lastSimDate || getPeriodKey(scanSimDate, ratePeriod) === lastPeriodKey) {
                 if (!isExcludedDay(scanSimDate)) {
-                    const key = getPeriodKey(scanSimDate, compoundFreq);
+                    const key = getPeriodKey(scanSimDate, ratePeriod);
                     periodTradingDays[key] = (periodTradingDays[key] || 0) + 1;
                 }
                 scanSimDate.setDate(scanSimDate.getDate() + 1);
@@ -957,12 +1266,13 @@
                 document.getElementById('evSummary').textContent = compound
                     ? `Per trade: EV ${fmtRate(arithmeticEv)}, geometric growth ${fmtRate(geometricRate)}. Compounding uses the geometric rate (typical outcome, not the average).`
                     : `Per trade: EV ${fmtRate(arithmeticEv)}. Simple returns use the arithmetic EV.`;
+                document.getElementById('evSummary').textContent += ' See the Monte Carlo tab for the range of possible outcomes.';
             }
 
             const getBaseDailyRate = (date) => {
                 if (activeMode === 'ev') return evRate;
-                if (returnBasis === 'daily') return pureReturn;
-                return pureReturn / (periodTradingDays[getPeriodKey(date, compoundFreq)] || 1);
+                if (ratePeriod === 'daily') return pureReturn;
+                return pureReturn / (periodTradingDays[getPeriodKey(date, ratePeriod)] || 1);
             };
 
             const rand = mulberry32(simSeed);
@@ -973,9 +1283,9 @@
             let totalWithdrawn = 0;
             let tradeIndex = 1;
 
-            for (const currentSimDate = new Date(startDate); currentSimDate < simEnd; currentSimDate.setDate(currentSimDate.getDate() + 1)) {
+            for (const currentSimDate = new Date(startDate); currentSimDate <= lastSimDate; currentSimDate.setDate(currentSimDate.getDate() + 1)) {
                 // Days past the schedule end are only simulated for the headline projections
-                const monthObj = currentSimDate < endDate ? monthsByKey[`${currentSimDate.getFullYear()}-${currentSimDate.getMonth()}`] : null;
+                const monthObj = currentSimDate <= endDate ? monthsByKey[`${currentSimDate.getFullYear()}-${currentSimDate.getMonth()}`] : null;
                 if (monthObj && monthObj.days.length === 0) {
                     monthObj.startBalance = runningBalance;
                 }
@@ -1086,12 +1396,12 @@
             if (pDate2) pDate2.textContent = formatDateShort(date3m);
             if (pDate3) pDate3.textContent = formatDateShort(date6m);
 
-            // Balance (and cash withdrawn so far) at the start of a target date
+            // Balance (and cash withdrawn so far) at the end of a target date
             const balanceAt = (target) => {
                 let balance = capital;
                 let withdrawn = 0;
                 for (const d of allDays) {
-                    if (d.date >= target) break;
+                    if (d.date > target) break;
                     balance = d.balanceAfter;
                     withdrawn = d.totalWithdrawn;
                 }
@@ -1123,7 +1433,7 @@
                     }
                 }
                 if (projWithdrawnEl) {
-                    projWithdrawnEl.textContent = `${formatUSD(p.withdrawn)} withdrawn`;
+                    projWithdrawnEl.textContent = `+${formatUSD(p.withdrawn)} withdrawn`;
                     projWithdrawnEl.classList.toggle('hidden', p.withdrawn < 0.005);
                 }
             });
@@ -1242,15 +1552,16 @@
             calculate();
         }
 
-        function updatePresetActiveStates(value) {
-            const btns = document.querySelectorAll('.duration-preset-btn');
+        function updatePresetActiveStates(value, selector = '.duration-preset-btn') {
+            const btns = document.querySelectorAll(selector);
+            const baseClass = selector.slice(1);
             const presets = [3, 6, 12, 24, 60];
             btns.forEach((btn, idx) => {
                 const presetVal = presets[idx];
                 if (presetVal === value) {
-                    btn.className = "duration-preset-btn bg-accentBlue/10 hover:bg-accentBlue/20 text-[10px] py-1 px-1.5 rounded-md font-bold text-accentBlue border border-accentBlue/20 transition-all";
+                    btn.className = `${baseClass} bg-accentBlue/10 hover:bg-accentBlue/20 text-[10px] py-1 px-1.5 rounded-md font-bold text-accentBlue border border-accentBlue/20 transition-all`;
                 } else {
-                    btn.className = "duration-preset-btn bg-gray-800/60 hover:bg-gray-800 text-[10px] py-1 px-1.5 rounded-md font-semibold text-gray-400 border border-transparent transition-all";
+                    btn.className = `${baseClass} bg-gray-800/60 hover:bg-gray-800 text-[10px] py-1 px-1.5 rounded-md font-semibold text-gray-400 border border-transparent transition-all`;
                 }
             });
         }
@@ -1317,9 +1628,369 @@
         document.getElementById('posVariance').addEventListener('input', calculate);
         document.getElementById('negVariance').addEventListener('input', calculate);
 
+        // ---------- Tabs ----------
+        let activeTab = 'projection';
+
+        function setTabUI(tab) {
+            activeTab = tab === 'montecarlo' ? 'montecarlo' : 'projection';
+            const tabs = {
+                projection: ['tabBtnProjection', 'tabProjection'],
+                montecarlo: ['tabBtnMonteCarlo', 'tabMonteCarlo']
+            };
+            Object.entries(tabs).forEach(([name, [btnId, panelId]]) => {
+                const isActive = name === activeTab;
+                const btn = document.getElementById(btnId);
+                btn.setAttribute('aria-selected', String(isActive));
+                btn.className = `tab-btn py-2 text-xs font-bold rounded-lg transition-all ${isActive ? 'text-white bg-accentBlue' : 'text-gray-400 hover:text-white'}`;
+                document.getElementById(panelId).classList.toggle('hidden', !isActive);
+            });
+        }
+
+        function setTab(tab) {
+            setTabUI(tab);
+            if (activeTab === 'montecarlo') runMonteCarlo();
+            saveSettings();
+        }
+
+        // ---------- Monte Carlo ----------
+        // Plays the win/loss strategy out many times with random trade order and reports the
+        // spread of outcomes. Seeded so results only change on "Re-run" or an input change.
+        let mcSeed = Math.floor(Math.random() * 4294967296);
+        let mcChartData = null;
+        let mcHoverIndex = null;
+        let mcHoverActive = false;
+        let mcTimer = null;
+
+        function rerunMonteCarlo() {
+            mcSeed = Math.floor(Math.random() * 4294967296);
+            runMonteCarlo();
+        }
+
+        // Sliders fire many events; batch them so large runs stay responsive
+        function scheduleMonteCarlo() {
+            clearTimeout(mcTimer);
+            mcTimer = setTimeout(runMonteCarlo, 120);
+        }
+
+        // Linear-interpolated percentile of an ascending-sorted array (p in 0..1)
+        function percentile(sorted, p) {
+            if (sorted.length === 0) return 0;
+            const idx = p * (sorted.length - 1);
+            const lo = Math.floor(idx);
+            const hi = Math.ceil(idx);
+            return sorted[lo] + (sorted[hi] - sorted[lo]) * (idx - lo);
+        }
+
+        function runMonteCarlo() {
+            clearTimeout(mcTimer);
+            const readNum = (id, fallback, min, max) => {
+                const v = parseFloat(document.getElementById(id).value);
+                return Math.min(Math.max(isNaN(v) ? fallback : v, min), max);
+            };
+            const capital = readNum('mcCapital', 0, 0, Infinity);
+            const winRate = readNum('mcWinRate', 0, 0, 100) / 100;
+            const avgWin = readNum('mcAvgWin', 0, 0, Infinity) / 100;
+            const avgLoss = readNum('mcAvgLoss', 0, 0, 100) / 100;
+            const tradesPerMonth = Math.round(readNum('mcTradesPerMonth', 21, 1, 100));
+            const months = Math.round(readNum('mcDuration', 12, 1, 60));
+            const sims = Math.round(readNum('mcSims', 1000, 100, 5000));
+            const ruinPct = readNum('mcRuin', 50, 10, 90);
+
+            document.getElementById('mcDurationVal').textContent = formatDurationLabel(months);
+            document.getElementById('mcRuinVal').textContent = `-${ruinPct}%`;
+            document.getElementById('mcSimsText').textContent = sims.toLocaleString('en-US');
+            updatePresetActiveStates(months, '.mc-duration-preset-btn');
+
+            const rand = mulberry32(mcSeed);
+            const ruinBalance = capital * (1 - ruinPct / 100);
+            // monthEnds[m][s] = balance of run s at the end of month m (month 0 = start)
+            const monthEnds = Array.from({ length: months + 1 }, () => new Float64Array(sims));
+            const maxDrawdowns = new Float64Array(sims);
+            const losingStreaks = new Float64Array(sims);
+            let ruinedRuns = 0;
+            let totalFinal = 0;
+
+            for (let s = 0; s < sims; s++) {
+                let balance = capital;
+                let peak = capital;
+                let maxDrawdown = 0;
+                let streak = 0;
+                let maxStreak = 0;
+                let ruined = false;
+                monthEnds[0][s] = capital;
+                for (let m = 1; m <= months; m++) {
+                    for (let t = 0; t < tradesPerMonth; t++) {
+                        if (rand() < winRate) {
+                            balance *= 1 + avgWin;
+                            streak = 0;
+                            if (balance > peak) peak = balance;
+                        } else {
+                            // Drawdowns, streaks and ruin can only get worse on a losing trade
+                            balance *= 1 - avgLoss;
+                            streak++;
+                            if (streak > maxStreak) maxStreak = streak;
+                            if (peak > 0) maxDrawdown = Math.max(maxDrawdown, (peak - balance) / peak);
+                            if (capital > 0 && balance <= ruinBalance) ruined = true;
+                        }
+                    }
+                    monthEnds[m][s] = balance;
+                }
+                maxDrawdowns[s] = maxDrawdown;
+                losingStreaks[s] = maxStreak;
+                if (ruined) ruinedRuns++;
+                totalFinal += balance;
+            }
+
+            const bands = { p10: [], p25: [], p50: [], p75: [], p90: [] };
+            let finals = null;
+            monthEnds.forEach((ends, m) => {
+                const sorted = Float64Array.from(ends).sort();
+                bands.p10.push(percentile(sorted, 0.10));
+                bands.p25.push(percentile(sorted, 0.25));
+                bands.p50.push(percentile(sorted, 0.50));
+                bands.p75.push(percentile(sorted, 0.75));
+                bands.p90.push(percentile(sorted, 0.90));
+                if (m === months) finals = sorted;
+            });
+
+            // Outcome cards
+            [['mcP10', bands.p10[months]], ['mcP50', bands.p50[months]], ['mcP90', bands.p90[months]]].forEach(([id, value]) => {
+                const pct = capital > 0 ? ((value - capital) / capital) * 100 : 0;
+                document.getElementById(id).textContent = formatUSD(value);
+                const deltaEl = document.getElementById(`${id}Delta`);
+                deltaEl.textContent = formatPercent(pct);
+                deltaEl.className = `text-[11px] font-semibold block mt-0.5 ${pct >= 0 ? 'text-emerald-400' : 'text-lossRed'}`;
+            });
+
+            // Risk stats
+            const setStat = (id, value, sub) => {
+                document.getElementById(id).textContent = value;
+                document.getElementById(`${id}Sub`).textContent = sub;
+            };
+            const pctText = (v) => `${(v * 100).toFixed(1)}%`;
+            const profitableRuns = finals.filter(v => v > capital).length;
+            const mean = totalFinal / sims;
+            const sortedDrawdowns = Float64Array.from(maxDrawdowns).sort();
+            const sortedStreaks = Float64Array.from(losingStreaks).sort();
+            setStat('mcProfitChance', pctText(profitableRuns / sims), `${profitableRuns.toLocaleString('en-US')} of ${sims.toLocaleString('en-US')} runs`);
+            setStat('mcMean', formatUSD(mean), capital > 0 ? formatPercent(((mean - capital) / capital) * 100) : '');
+            setStat('mcRuinChance', pctText(ruinedRuns / sims), `fell to ${formatUSD(ruinBalance)} or less`);
+            setStat('mcLosingStreak', `${Math.round(percentile(sortedStreaks, 0.5))} in a row`, `1 in 10 runs: ${Math.round(percentile(sortedStreaks, 0.9))}+ in a row`);
+            setStat('mcDrawdown', `-${pctText(percentile(sortedDrawdowns, 0.5))}`, 'below a previous high');
+            setStat('mcDrawdownBad', `-${pctText(percentile(sortedDrawdowns, 0.9))}`, '1 in 10 runs went this deep');
+
+            mcChartData = { bands, capital, months };
+            renderMcChart();
+            renderMcTable();
+            saveSettings();
+        }
+
+        // About `count` evenly spaced round values covering [lo, hi]
+        function niceTicks(lo, hi, count) {
+            const raw = (hi - lo) / count || Math.abs(hi) / count || 1;
+            const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+            const step = [1, 2, 2.5, 5, 10].map(f => f * mag).find(st => st >= raw);
+            const ticks = [];
+            const end = Math.ceil(hi / step) * step;
+            for (let v = Math.floor(lo / step) * step; v <= end + step * 1e-9; v += step) {
+                ticks.push(+v.toPrecision(12));
+            }
+            return ticks;
+        }
+
+        function renderMcChart() {
+            const wrap = document.getElementById('mcChart');
+            if (!mcChartData || wrap.clientWidth === 0) return;
+            const { bands, capital, months } = mcChartData;
+            const W = wrap.clientWidth;
+            const H = 230;
+            const pad = { l: 52, r: 14, t: 12, b: 28 };
+            const pw = W - pad.l - pad.r;
+            const ph = H - pad.t - pad.b;
+            const ticks = niceTicks(Math.min(capital, ...bands.p10), Math.max(capital, ...bands.p90), 4);
+            const lo = ticks[0];
+            const hi = ticks[ticks.length - 1] > lo ? ticks[ticks.length - 1] : lo + 1;
+            const x = (i) => pad.l + (i / months) * pw;
+            const y = (v) => pad.t + ph - ((v - lo) / (hi - lo)) * ph;
+            const pts = (arr) => arr.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`);
+            const linePath = (arr) => 'M' + pts(arr).join('L');
+            const bandPath = (lower, upper) => 'M' + pts(upper).join('L') + 'L' + pts(lower).reverse().join('L') + 'Z';
+            const xStep = months <= 6 ? 1 : months <= 12 ? 3 : months <= 24 ? 6 : 12;
+            const xLabel = (m) => m === 0 ? 'Now' : months > 24 ? `${m / 12}y` : `${m}m`;
+
+            let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" class="block select-none" aria-hidden="true">`;
+            ticks.forEach(t => {
+                svg += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(t)}" y2="${y(t)}" stroke="#1F2937" stroke-width="1"/>`;
+                svg += `<text x="${pad.l - 8}" y="${y(t) + 3.5}" text-anchor="end" font-size="10" fill="#6B7280">${formatCompactUSD(t)}</text>`;
+            });
+            for (let m = 0; m <= months; m += xStep) {
+                svg += `<text x="${x(m)}" y="${H - 8}" text-anchor="middle" font-size="10" fill="#6B7280">${xLabel(m)}</text>`;
+            }
+            svg += `<path d="${bandPath(bands.p10, bands.p90)}" fill="#34D399" fill-opacity="0.10"/>`;
+            svg += `<path d="${bandPath(bands.p25, bands.p75)}" fill="#34D399" fill-opacity="0.22"/>`;
+            svg += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${y(capital)}" y2="${y(capital)}" stroke="#6B7280" stroke-width="1"/>`;
+            svg += `<path d="${linePath(bands.p50)}" fill="none" stroke="#34D399" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+            svg += `<g id="mcCrosshair" visibility="hidden"><line id="mcCrossLine" y1="${pad.t}" y2="${pad.t + ph}" stroke="#9CA3AF" stroke-width="1"/><circle id="mcCrossDot" r="4" fill="#34D399" stroke="#111827" stroke-width="2"/></g>`;
+            svg += `<rect id="mcHit" x="0" y="0" width="${W}" height="${H}" fill="transparent"/>`;
+            svg += `</svg><div id="mcTooltip" class="absolute pointer-events-none bg-[#1F2937] border border-gray-700 rounded-lg px-2.5 py-2 shadow-lg space-y-0.5 min-w-[150px]" hidden></div>`;
+            wrap.innerHTML = svg;
+
+            mcChartData.geom = { x, y, pad, W };
+            document.getElementById('mcHit').addEventListener('pointermove', (e) => {
+                const px = e.clientX - wrap.getBoundingClientRect().left;
+                showMcHover(Math.round(Math.min(Math.max((px - pad.l) / pw, 0), 1) * months));
+            });
+            document.getElementById('mcHit').addEventListener('pointerleave', () => {
+                if (document.activeElement !== wrap) hideMcHover();
+            });
+            // Redraws (e.g. phone address bar resizing the window) keep the open readout
+            if (mcHoverActive) showMcHover(mcHoverIndex ?? months);
+        }
+
+        function showMcHover(index) {
+            if (!mcChartData || !mcChartData.geom) return;
+            const { bands, months, geom } = mcChartData;
+            mcHoverIndex = Math.min(Math.max(index, 0), months);
+            mcHoverActive = true;
+            const cx = geom.x(mcHoverIndex);
+            document.getElementById('mcCrossLine').setAttribute('x1', cx);
+            document.getElementById('mcCrossLine').setAttribute('x2', cx);
+            document.getElementById('mcCrossDot').setAttribute('cx', cx);
+            document.getElementById('mcCrossDot').setAttribute('cy', geom.y(bands.p50[mcHoverIndex]));
+            document.getElementById('mcCrosshair').setAttribute('visibility', 'visible');
+
+            const tip = document.getElementById('mcTooltip');
+            const title = document.createElement('div');
+            title.className = 'text-[10px] font-semibold text-gray-400 mb-1';
+            title.textContent = mcHoverIndex === 0 ? 'Start' : `End of month ${mcHoverIndex}`;
+            const rows = [['Lucky', bands.p90], ['Typical', bands.p50], ['Unlucky', bands.p10]].map(([label, arr]) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-baseline justify-between gap-3';
+                const value = document.createElement('span');
+                value.className = 'text-xs font-bold text-white';
+                value.textContent = formatUSD(arr[mcHoverIndex]);
+                const name = document.createElement('span');
+                name.className = 'text-[10px] text-gray-400';
+                name.textContent = label;
+                row.append(value, name);
+                return row;
+            });
+            tip.replaceChildren(title, ...rows);
+            tip.hidden = false;
+            // Sit beside the crosshair, flipping to the left near the right edge
+            const left = cx + 12 + tip.offsetWidth > geom.W ? cx - 12 - tip.offsetWidth : cx + 12;
+            tip.style.left = `${Math.max(0, left)}px`;
+            tip.style.top = `${geom.pad.t}px`;
+        }
+
+        function hideMcHover() {
+            mcHoverActive = false;
+            const cross = document.getElementById('mcCrosshair');
+            const tip = document.getElementById('mcTooltip');
+            if (cross) cross.setAttribute('visibility', 'hidden');
+            if (tip) tip.hidden = true;
+        }
+
+        function renderMcTable() {
+            const { bands, months } = mcChartData;
+            let html = '<table class="w-full text-right"><thead class="text-[10px] text-gray-500 uppercase"><tr><th class="text-left font-semibold py-1">Month</th><th class="font-semibold">Unlucky</th><th class="font-semibold">Typical</th><th class="font-semibold">Lucky</th></tr></thead><tbody class="divide-y divide-gray-800/60">';
+            for (let m = 0; m <= months; m++) {
+                html += `<tr><td class="text-left text-gray-400 py-1">${m === 0 ? 'Start' : m}</td><td class="text-gray-300">${formatUSD(bands.p10[m])}</td><td class="text-white font-semibold">${formatUSD(bands.p50[m])}</td><td class="text-gray-300">${formatUSD(bands.p90[m])}</td></tr>`;
+            }
+            document.getElementById('mcTable').innerHTML = html + '</tbody></table>';
+        }
+
+        function setMcDurationPreset(months) {
+            document.getElementById('mcDuration').value = months;
+            runMonteCarlo();
+        }
+
+        ['mcCapital', 'mcWinRate', 'mcAvgWin', 'mcAvgLoss', 'mcTradesPerMonth', 'mcDuration', 'mcRuin'].forEach(id => {
+            document.getElementById(id).addEventListener('input', scheduleMonteCarlo);
+        });
+        document.getElementById('mcSims').addEventListener('change', runMonteCarlo);
+
+        const mcChartEl = document.getElementById('mcChart');
+        mcChartEl.addEventListener('keydown', (e) => {
+            if (!mcChartData || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+            e.preventDefault();
+            showMcHover((mcHoverIndex ?? mcChartData.months) + (e.key === 'ArrowRight' ? 1 : -1));
+        });
+        mcChartEl.addEventListener('focus', () => {
+            if (mcChartData) showMcHover(mcHoverIndex ?? mcChartData.months);
+        });
+        mcChartEl.addEventListener('blur', hideMcHover);
+        window.addEventListener('resize', () => {
+            if (activeTab === 'montecarlo') renderMcChart();
+        });
+
+        // ---------- Tooltips ----------
+        // Shift a tooltip sideways (and flip it below its icon) so it never runs off screen
+        function positionTooltip(container) {
+            const tip = container.querySelector('.tooltip-text');
+            if (!tip) return;
+            container.classList.remove('tt-below');
+            tip.style.setProperty('--tt-shift', '0px');
+            const margin = 8;
+            let rect = tip.getBoundingClientRect();
+            if (rect.top < margin) {
+                container.classList.add('tt-below');
+                rect = tip.getBoundingClientRect();
+            }
+            let shift = 0;
+            if (rect.left < margin) shift = margin - rect.left;
+            else if (rect.right > window.innerWidth - margin) shift = window.innerWidth - margin - rect.right;
+            tip.style.setProperty('--tt-shift', `${shift}px`);
+        }
+
+        // Make every info icon reachable by keyboard and readable by screen readers
+        document.querySelectorAll('.tooltip-container').forEach(el => {
+            el.tabIndex = 0;
+            el.setAttribute('role', 'button');
+        });
+        document.addEventListener('pointerover', (e) => {
+            const container = e.target.closest && e.target.closest('.tooltip-container');
+            if (container) positionTooltip(container);
+        });
+        document.addEventListener('focusin', (e) => {
+            const container = e.target.closest && e.target.closest('.tooltip-container');
+            if (!container) return;
+            container.setAttribute('aria-label', container.querySelector('.tooltip-text').textContent.trim());
+            positionTooltip(container);
+        });
+        // Tap (or click) toggles a tooltip; tapping anywhere else closes it
+        document.addEventListener('click', (e) => {
+            const container = e.target.closest && e.target.closest('.tooltip-container');
+            document.querySelectorAll('.tooltip-container.tt-open').forEach(el => {
+                if (el !== container) el.classList.remove('tt-open');
+            });
+            if (container) {
+                container.classList.toggle('tt-open');
+                positionTooltip(container);
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.tooltip-container.tt-open').forEach(el => el.classList.remove('tt-open'));
+            }
+        });
+
+        // ---------- Settings ----------
+        const mcDefaults = {
+            mcCapital: '10000',
+            mcWinRate: '50',
+            mcAvgWin: '2.0',
+            mcAvgLoss: '1.0',
+            mcTradesPerMonth: '21',
+            mcDuration: '12',
+            mcSims: '1000',
+            mcRuin: '50'
+        };
+
         function saveSettings() {
             const settings = {
                 activeMode: activeMode,
+                activeTab: activeTab,
                 capital: document.getElementById('capital').value,
                 durationMonths: document.getElementById('durationMonths').value,
                 winRate: document.getElementById('winRate').value,
@@ -1339,6 +2010,9 @@
                 randomProbability: document.getElementById('randomProbability').value,
                 activeDays: activeDays
             };
+            Object.keys(mcDefaults).forEach(id => {
+                settings[id] = document.getElementById(id).value;
+            });
             localStorage.setItem('returnsCalcSettings', JSON.stringify(settings));
         }
 
@@ -1350,8 +2024,15 @@
                 if (settings.activeMode) {
                     setModeUI(settings.activeMode);
                 }
+                if (settings.activeTab) {
+                    activeTab = settings.activeTab;
+                }
+                // Older versions stored "frequency" to mean "per compounding period"
+                if (settings.returnBasis === 'frequency') {
+                    settings.returnBasis = settings.compoundFreq || 'daily';
+                }
                 
-                const textFields = ['capital', 'winRate', 'avgWin', 'avgLoss', 'pureReturn', 'posVariance', 'negVariance', 'reinvestRate', 'randomProbability', 'durationMonths'];
+                const textFields = ['capital', 'winRate', 'avgWin', 'avgLoss', 'pureReturn', 'posVariance', 'negVariance', 'reinvestRate', 'randomProbability', 'durationMonths', ...Object.keys(mcDefaults)];
                 textFields.forEach(field => {
                     if (settings[field] !== undefined) {
                         document.getElementById(field).value = settings[field];
@@ -1401,6 +2082,9 @@
             document.getElementById('excludeWeekends').checked = true;
             document.getElementById('randomizeSkips').checked = false;
             document.getElementById('randomProbability').value = "80";
+            Object.entries(mcDefaults).forEach(([id, value]) => {
+                document.getElementById(id).value = value;
+            });
             
             activeDays = {
                 1: true,  // Mon
@@ -1416,6 +2100,7 @@
             updatePresetActiveStates(12);
             updateDowButtonsUI();
             calculate();
+            if (activeTab === 'montecarlo') runMonteCarlo();
         }
 
         // Initial execution
@@ -1429,6 +2114,8 @@
         }
         updateDowButtonsUI();
         calculate();
+        setTabUI(activeTab);
+        if (activeTab === 'montecarlo') runMonteCarlo();
     </script>
 </body>
 </html>
