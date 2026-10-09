@@ -133,18 +133,21 @@
                 <p id="projDate1" class="text-[9px] text-gray-500 mb-1.5">-</p>
                 <div id="proj1" class="text-sm font-extrabold text-white">$0.00</div>
                 <span id="projDelta1" class="text-[11px] text-emerald-400 font-semibold block mt-0.5">+0.0%</span>
+                <span id="projWithdrawn1" class="text-[9px] text-amber-400 font-semibold block mt-0.5 hidden"></span>
             </div>
             <div class="bg-darkCard/60 border border-darkBorder/60 rounded-2xl p-3.5 text-center shadow-md">
                 <p id="projLabel2" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">3 Months</p>
                 <p id="projDate2" class="text-[9px] text-gray-500 mb-1.5">-</p>
                 <div id="proj2" class="text-sm font-extrabold text-white">$0.00</div>
                 <span id="projDelta2" class="text-[11px] text-emerald-400 font-semibold block mt-0.5">+0.0%</span>
+                <span id="projWithdrawn2" class="text-[9px] text-amber-400 font-semibold block mt-0.5 hidden"></span>
             </div>
             <div class="bg-darkCard/60 border border-darkBorder/60 rounded-2xl p-3.5 text-center shadow-md">
                 <p id="projLabel3" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">6 Months</p>
                 <p id="projDate3" class="text-[9px] text-gray-500 mb-1.5">-</p>
                 <div id="proj3" class="text-sm font-extrabold text-white">$0.00</div>
                 <span id="projDelta3" class="text-[11px] text-emerald-400 font-semibold block mt-0.5">+0.0%</span>
+                <span id="projWithdrawn3" class="text-[9px] text-amber-400 font-semibold block mt-0.5 hidden"></span>
             </div>
         </section>
 
@@ -171,7 +174,7 @@
                     </div>
                     <div class="relative">
                         <span class="absolute left-3.5 top-3.5 text-gray-500 font-semibold text-sm">$</span>
-                        <input type="number" id="capital" value="10000" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 pl-8 pr-4 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                        <input type="number" id="capital" value="10000" min="0" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 pl-8 pr-4 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
                     </div>
                 </div>
 
@@ -212,7 +215,7 @@
                             </span>
                         </div>
                         <div class="relative">
-                            <input type="number" id="winRate" value="50" step="0.5" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                            <input type="number" id="winRate" value="50" step="0.5" min="0" max="100" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
                             <span class="absolute right-3.5 top-3.5 text-gray-500 font-semibold text-sm">%</span>
                         </div>
                     </div>
@@ -227,7 +230,7 @@
                             </span>
                         </div>
                         <div class="relative">
-                            <input type="number" id="avgWin" value="2.0" step="0.1" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                            <input type="number" id="avgWin" value="2.0" step="0.1" min="0" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
                             <span class="absolute right-3.5 top-3.5 text-emerald-500 font-semibold text-sm">%</span>
                         </div>
                     </div>
@@ -242,10 +245,11 @@
                             </span>
                         </div>
                         <div class="relative">
-                            <input type="number" id="avgLoss" value="1.0" step="0.1" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                            <input type="number" id="avgLoss" value="1.0" step="0.1" min="0" max="100" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
                             <span class="absolute right-3.5 top-3.5 text-lossRed font-semibold text-sm">%</span>
                         </div>
                     </div>
+                    <p id="evSummary" class="col-span-2 text-[10px] text-gray-500 leading-snug"></p>
                 </div>
 
                 <!-- PURE RETURN INPUTS GROUP -->
@@ -273,7 +277,7 @@
                             </span>
                         </div>
                         <div class="relative">
-                            <input type="number" id="pureReturn" value="1.0" step="0.1" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
+                            <input type="number" id="pureReturn" value="1.0" step="0.1" min="-100" class="w-full bg-[#1F2937]/40 border border-gray-700/60 rounded-xl py-3 px-3.5 text-white text-base font-bold focus:outline-none focus:border-accentBlue focus:ring-2 focus:ring-accentBlue/20 transition-all">
                             <span class="absolute right-3.5 top-3.5 text-emerald-500 font-semibold text-sm">%</span>
                         </div>
                     </div>
@@ -359,7 +363,7 @@
                             <label for="reinvestRate" class="block text-xs font-medium text-gray-400">Portion to Compound (%)</label>
                             <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <span class="tooltip-text">Percentage of daily returns to reinvest. <br><strong>Example:</strong> Set to 80% to reinvest 80% and withdraw 20% of gains daily.</span>
+                                <span class="tooltip-text">Percentage of daily returns to reinvest. <br><strong>Example:</strong> Set to 80% to reinvest 80% and withdraw 20% of gains daily. Losses always come out of the account in full.</span>
                             </span>
                         </div>
                         <span id="reinvestVal" class="text-xs font-bold text-accentBlue">100%</span>
@@ -401,6 +405,7 @@
                             </button>
                         </div>
                         <span id="syncStatus" class="text-[10px] text-gray-500">MOM-observed public holidays</span>
+                        <span id="holidayWarning" class="text-[10px] text-yellow-500 hidden"></span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="excludeHolidays" checked class="sr-only peer">
@@ -418,7 +423,7 @@
                                 <span class="tooltip-text">Excludes Saturdays and Sundays from trading and compounding.</span>
                             </span>
                         </div>
-                        <span id="syncStatus" class="text-[10px] text-gray-500">Saturdays & Sundays</span>
+                        <span class="text-[10px] text-gray-500">Saturdays & Sundays</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="excludeWeekends" checked class="sr-only peer">
@@ -427,7 +432,7 @@
                 </div>
 
                 <!-- Active Trading Days -->
-                <div class="space-y-2 pt-1 border-t border-gray-850">
+                <div class="space-y-2 pt-3 border-t border-gray-800/40">
                     <div class="flex items-center">
                         <span class="block text-xs font-semibold text-gray-300">Active Trading Days</span>
                         <span class="tooltip-container ml-1.5 cursor-help text-gray-500 hover:text-gray-300">
@@ -486,7 +491,7 @@
             <div class="flex items-center justify-between px-1">
                 <h2 id="scheduleTitle" class="text-xs font-bold text-gray-400 uppercase tracking-widest">12-Month Projected Schedule</h2>
                 <div class="flex items-center space-x-2">
-                    <button id="rerunBtn" onclick="calculate()" class="hidden text-[10px] bg-accentBlue/10 hover:bg-accentBlue/20 text-accentBlue font-bold px-2 py-1 rounded border border-accentBlue/20 transition-all flex items-center">
+                    <button id="rerunBtn" onclick="rerunSimulation()" class="hidden text-[10px] bg-accentBlue/10 hover:bg-accentBlue/20 text-accentBlue font-bold px-2 py-1 rounded border border-accentBlue/20 transition-all flex items-center">
                         🎲 Re-run Sim
                     </button>
                     <span class="text-[10px] text-gray-500 uppercase font-semibold">Click month to expand daily view</span>
@@ -517,6 +522,25 @@
             0: false  // Sun
         };
 
+        // Seed for the random simulation, so re-rendering (e.g. expanding a month) doesn't
+        // re-roll the results. "Re-run Sim" draws a new seed.
+        let simSeed = Math.floor(Math.random() * 4294967296);
+
+        function mulberry32(seed) {
+            let a = seed >>> 0;
+            return function() {
+                a = (a + 0x6D2B79F5) | 0;
+                let t = Math.imul(a ^ (a >>> 15), 1 | a);
+                t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+                return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+            };
+        }
+
+        function rerunSimulation() {
+            simSeed = Math.floor(Math.random() * 4294967296);
+            calculate();
+        }
+
         async function syncHolidays() {
             const btn = document.getElementById('syncHolsBtn');
             const status = document.getElementById('syncStatus');
@@ -535,22 +559,27 @@
                 let updatedCount = 0;
                 results.forEach((hList, idx) => {
                     const yr = idx === 0 ? thisYear : nextYear;
-                    if (hList.length > 0) {
-                        holidaysBase[String(yr)] = hList.map(h => h.date);
+                    // Merge rather than replace: the API can be incomplete (e.g. missing lunar
+                    // holidays for future years). Dates already active are skipped, since the API
+                    // lists the in-lieu Monday instead of the Sunday holiday itself.
+                    const active = getActiveHolidays(yr);
+                    const newDates = hList.map(h => h.date).filter(d => !active.has(d));
+                    if (newDates.length > 0 || !holidaysBase[yr]) {
+                        holidaysBase[String(yr)] = [...(holidaysBase[yr] || getFallbackHolidays(yr)), ...newDates];
                         // Clear cache so it regenerates active holidays with Sunday replacement rule
                         delete activeHolidaysMap[String(yr)];
-                        updatedCount += hList.length;
+                        updatedCount += newDates.length;
                     }
                 });
-                
+
                 if (updatedCount > 0) {
-                    status.textContent = `Synced ${updatedCount} holidays for ${thisYear}-${nextYear}`;
+                    status.textContent = `Added ${updatedCount} holiday${updatedCount > 1 ? 's' : ''} for ${thisYear}-${nextYear}`;
                     status.className = "text-[10px] text-emerald-400 font-semibold";
-                    calculate();
                 } else {
-                    status.textContent = "No new holidays found. Using offline defaults.";
+                    status.textContent = "Holidays already up to date.";
                     status.className = "text-[10px] text-gray-500";
                 }
+                calculate();
             } catch (err) {
                 console.error(err);
                 status.textContent = "Sync failed. Offline defaults active.";
@@ -561,7 +590,8 @@
             }
         }
 
-        // Official SG Gazetted Holidays 2026, 2027 & 2028 (Base dates)
+        // SG gazetted holidays (base dates). 2026 & 2027 are official MOM lists; 2028 is
+        // provisional until MOM publishes it (lunar dates may shift by a day).
         const holidaysBase = {
             "2026": [
                 "2026-01-01", // New Year's Day
@@ -593,44 +623,66 @@
                 "2028-01-01", // New Year's Day
                 "2028-01-26", // Chinese New Year
                 "2028-01-27", // Chinese New Year
-                "2028-02-27", // Hari Raya Puasa
+                "2028-02-27", // Hari Raya Puasa (provisional)
                 "2028-04-14", // Good Friday
                 "2028-05-01", // Labour Day
-                "2028-05-05", // Hari Raya Haji
-                "2028-05-09", // Vesak Day
+                "2028-05-05", // Hari Raya Haji (provisional)
+                "2028-05-09", // Vesak Day (provisional)
                 "2028-08-09", // National Day
-                "2028-10-28", // Deepavali
+                "2028-10-17", // Deepavali (provisional)
                 "2028-12-25"  // Christmas Day
             ]
         };
 
+        function toDateKey(date) {
+            const y = date.getFullYear();
+            const m = String(date.getMonth() + 1).padStart(2, '0');
+            const d = String(date.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // Adds calendar months, clamping to the last day of the target month (Jan 31 + 1 -> Feb 28)
+        function addMonths(date, months) {
+            const target = new Date(date.getFullYear(), date.getMonth() + months, 1);
+            const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+            target.setDate(Math.min(date.getDate(), lastDay));
+            return target;
+        }
+
+        // First day of the compounding period containing the date
+        function getPeriodStart(date, frequency) {
+            const y = date.getFullYear();
+            const m = date.getMonth();
+            if (frequency === 'weekly') {
+                // Monday is start of week
+                const monday = new Date(y, m, date.getDate());
+                monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+                return monday;
+            }
+            if (frequency === 'monthly') return new Date(y, m, 1);
+            if (frequency === 'quarterly') return new Date(y, m - (m % 3), 1);
+            if (frequency === 'annually') return new Date(y, 0, 1);
+            return new Date(y, m, date.getDate());
+        }
+
         // Helper to determine compounding period keys for rate distribution and timing
         function getPeriodKey(date, frequency) {
-            const y = date.getFullYear();
-            if (frequency === 'daily') {
-                const m = String(date.getMonth() + 1).padStart(2, '0');
-                const d = String(date.getDate()).padStart(2, '0');
-                return `${y}-${m}-${d}`;
-            }
-            if (frequency === 'weekly') {
-                const temp = new Date(date);
-                const day = temp.getDay();
-                // Monday is start of week
-                const mondayDiff = temp.getDate() - (day === 0 ? 6 : day - 1);
-                const monday = new Date(temp.setDate(mondayDiff));
-                return `W-${monday.getFullYear()}-${monday.getMonth() + 1}-${monday.getDate()}`;
-            }
-            if (frequency === 'monthly') {
-                return `M-${y}-${date.getMonth()}`;
-            }
-            if (frequency === 'quarterly') {
-                const q = Math.floor(date.getMonth() / 3) + 1;
-                return `Q-${y}-${q}`;
-            }
-            if (frequency === 'annually') {
-                return `A-${y}`;
-            }
-            return 'default';
+            return `${frequency}:${toDateKey(getPeriodStart(date, frequency))}`;
+        }
+
+        // Years without a gazetted list only get the holidays whose dates can be computed:
+        // fixed-date holidays plus Good Friday. Lunar holidays can't be derived reliably.
+        function getFallbackHolidays(year) {
+            // Easter Sunday via the anonymous Gregorian algorithm
+            const a = year % 19, b = Math.floor(year / 100), c = year % 100;
+            const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+            const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+            const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+            const month = Math.floor((h + l - 7 * m + 114) / 31);
+            const day = ((h + l - 7 * m + 114) % 31) + 1;
+            const goodFriday = new Date(year, month - 1, day - 2);
+            return [`${year}-01-01`, toDateKey(goodFriday), `${year}-05-01`, `${year}-08-09`, `${year}-12-25`];
         }
 
         // Cache generated active holiday lists including replacement holidays
@@ -640,21 +692,20 @@
             if (activeHolidaysMap[year]) {
                 return activeHolidaysMap[year];
             }
-            const base = holidaysBase[year] || [];
+            const base = holidaysBase[year] || getFallbackHolidays(year);
             const active = new Set(base);
             
-            // Apply replacement rule: if holiday falls on Sunday, following Monday is off.
+            // Apply replacement rule: if a holiday falls on Sunday, the next day that isn't
+            // already a holiday is off (Monday, or Tuesday when Monday is also a holiday).
             base.forEach(dateStr => {
                 const parts = dateStr.split('-');
                 const d = new Date(parts[0], parts[1] - 1, parts[2]);
                 if (d.getDay() === 0) { // Sunday
-                    const mon = new Date(d);
-                    mon.setDate(mon.getDate() + 1);
-                    
-                    const y = mon.getFullYear();
-                    const m = String(mon.getMonth() + 1).padStart(2, '0');
-                    const day = String(mon.getDate()).padStart(2, '0');
-                    active.add(`${y}-${m}-${day}`);
+                    const inLieu = new Date(d);
+                    do {
+                        inLieu.setDate(inLieu.getDate() + 1);
+                    } while (active.has(toDateKey(inLieu)));
+                    active.add(toDateKey(inLieu));
                 }
             });
             activeHolidaysMap[year] = active;
@@ -667,13 +718,7 @@
         }
 
         function isSgHoliday(date) {
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const dateStr = `${y}-${m}-${day}`;
-
-            const holidaySet = getActiveHolidays(y);
-            return holidaySet.has(dateStr);
+            return getActiveHolidays(date.getFullYear()).has(toDateKey(date));
         }
 
         // Formatting utilities
@@ -721,7 +766,7 @@
 
         function calculate() {
             // Get inputs
-            const capital = parseFloat(document.getElementById('capital').value) || 0;
+            const capital = Math.max(parseFloat(document.getElementById('capital').value) || 0, 0);
             const compound = document.getElementById('compound').checked;
             const reinvestRateRaw = parseFloat(document.getElementById('reinvestRate').value);
             const reinvestRate = isNaN(reinvestRateRaw) ? 100 : reinvestRateRaw;
@@ -790,7 +835,7 @@
                     else if (compoundFreq === 'annually') freqWord = "annually";
                     compoundHelperTextEl.textContent = `Reinvest returns ${freqWord}`;
                 } else {
-                    compoundHelperTextEl.textContent = "Reinvest returns daily";
+                    compoundHelperTextEl.textContent = "Simple returns on starting capital";
                 }
             }
 
@@ -835,173 +880,146 @@
             // Calculate daily calendar and populate month-by-month view
             const scheduleContainer = document.getElementById('monthlySchedule');
 
-            // Generate timeline
-            const startDate = new Date();
-            let currentSimDate = new Date(startDate);
+            // Timeline: starts today and runs exactly N calendar months (end date exclusive)
+            const now = new Date();
+            const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const endDate = addMonths(startDate, durationMonths);
+
+            // Headline projection dates. Each card shows the balance at the start of its date,
+            // so the 3-month card matches the final balance of a 3-month duration.
+            const date30 = new Date(startDate);
+            date30.setDate(date30.getDate() + 30);
+            const date3m = addMonths(startDate, 3);
+            const date6m = addMonths(startDate, 6);
+
+            // Simulate far enough to cover both the schedule and every headline projection
+            const simEnd = endDate > date6m ? endDate : date6m;
             
-            // Create list of upcoming months based on user duration
+            // Create list of calendar months covered by the schedule
             const monthsData = [];
-            let tempDate = new Date(startDate);
-            for (let i = 0; i < durationMonths; i++) {
-                monthsData.push({
-                    year: tempDate.getFullYear(),
-                    month: tempDate.getMonth(), // 0-indexed
+            const monthsByKey = {};
+            for (let m = new Date(startDate.getFullYear(), startDate.getMonth(), 1); m < endDate; m = new Date(m.getFullYear(), m.getMonth() + 1, 1)) {
+                const monthObj = {
+                    year: m.getFullYear(),
+                    month: m.getMonth(), // 0-indexed
                     days: [],
                     startBalance: 0,
                     endBalance: 0,
                     delta: 0,
+                    withdrawn: 0,
                     weekendsExcluded: 0,
                     holidaysExcluded: 0,
                     tradingDays: 0
-                });
-                tempDate.setMonth(tempDate.getMonth() + 1);
+                };
+                monthsData.push(monthObj);
+                monthsByKey[`${monthObj.year}-${monthObj.month}`] = monthObj;
             }
 
-            const targetEndMonth = monthsData[monthsData.length - 1].month;
-            const targetEndYear = monthsData[monthsData.length - 1].year;
+            const isExcludedDay = (date) =>
+                (excludeWeekends && isWeekend(date)) || (excludeHolidays && isSgHoliday(date)) || !activeDays[date.getDay()];
 
-            // Pre-count active trading days per period
+            // Pre-count active trading days per period. Whole calendar periods are scanned,
+            // including days before today and after the end, so a partial first or last period
+            // earns only its pro-rata share of a per-period return.
             const periodTradingDays = {};
-            let scanSimDate = new Date(startDate);
-            while (true) {
-                const year = scanSimDate.getFullYear();
-                const month = scanSimDate.getMonth();
-                const monthObj = monthsData.find(m => m.year === year && m.month === month);
-                if (!monthObj) {
-                    if (year > targetEndYear || (year === targetEndYear && month > targetEndMonth)) {
-                        break;
-                    }
-                    scanSimDate.setDate(scanSimDate.getDate() + 1);
-                    continue;
-                }
-                const isWknd = isWeekend(scanSimDate);
-                const isHol = isSgHoliday(scanSimDate);
-                const dayOfWeek = scanSimDate.getDay();
-                const isDowActive = activeDays[dayOfWeek];
-                const isExcluded = (excludeWeekends && isWknd) || (excludeHolidays && isHol) || !isDowActive;
-                if (!isExcluded) {
+            const lastSimDate = new Date(simEnd);
+            lastSimDate.setDate(lastSimDate.getDate() - 1);
+            const lastPeriodKey = getPeriodKey(lastSimDate, compoundFreq);
+            const scanSimDate = getPeriodStart(startDate, compoundFreq);
+            while (scanSimDate < simEnd || getPeriodKey(scanSimDate, compoundFreq) === lastPeriodKey) {
+                if (!isExcludedDay(scanSimDate)) {
                     const key = getPeriodKey(scanSimDate, compoundFreq);
                     periodTradingDays[key] = (periodTradingDays[key] || 0) + 1;
                 }
                 scanSimDate.setDate(scanSimDate.getDate() + 1);
             }
 
-            let evPercentValue = 0;
-            let compoundRate = 0;
+            const pureReturn = Math.max(parseFloat(document.getElementById('pureReturn').value) || 0, -100) / 100;
+            let evRate = 0;
 
             if (activeMode === 'ev') {
-                const winRate = parseFloat(document.getElementById('winRate').value) / 100 || 0;
-                const avgWin = parseFloat(document.getElementById('avgWin').value) / 100 || 0;
-                const avgLoss = parseFloat(document.getElementById('avgLoss').value) / 100 || 0;
+                const winRate = Math.min(Math.max(parseFloat(document.getElementById('winRate').value) || 0, 0), 100) / 100;
+                const avgWin = Math.max(parseFloat(document.getElementById('avgWin').value) || 0, 0) / 100;
+                const avgLoss = Math.min(Math.max(parseFloat(document.getElementById('avgLoss').value) || 0, 0), 100) / 100;
                 
                 // Arithmetic EV (average expected value per trade)
-                evPercentValue = (winRate * avgWin) - ((1 - winRate) * avgLoss);
+                const arithmeticEv = (winRate * avgWin) - ((1 - winRate) * avgLoss);
                 
                 // Geometric Compound Rate for realistic compound simulation:
                 // (1 + avgWin)^winRate * (1 - avgLoss)^(1 - winRate) - 1
-                compoundRate = Math.pow(1 + avgWin, winRate) * Math.pow(1 - avgLoss, 1 - winRate) - 1;
-            } else {
-                const pureReturn = parseFloat(document.getElementById('pureReturn').value) || 0;
-                if (returnBasis === 'daily') {
-                    evPercentValue = pureReturn / 100;
-                    compoundRate = evPercentValue;
-                } else {
-                    const firstPeriodKey = getPeriodKey(startDate, compoundFreq);
-                    const firstPeriodDays = periodTradingDays[firstPeriodKey] || 1;
-                    evPercentValue = (pureReturn / 100) / firstPeriodDays;
-                    compoundRate = evPercentValue;
-                }
+                const geometricRate = Math.pow(1 + avgWin, winRate) * Math.pow(1 - avgLoss, 1 - winRate) - 1;
+
+                // Compounding follows the geometric (typical/median) path; simple returns don't
+                // compound, so their expected value is the arithmetic EV.
+                evRate = compound ? geometricRate : arithmeticEv;
+
+                const fmtRate = (r) => `${r >= 0 ? '+' : ''}${(r * 100).toFixed(3)}%`;
+                document.getElementById('evSummary').textContent = compound
+                    ? `Per trade: EV ${fmtRate(arithmeticEv)}, geometric growth ${fmtRate(geometricRate)}. Compounding uses the geometric rate (typical outcome, not the average).`
+                    : `Per trade: EV ${fmtRate(arithmeticEv)}. Simple returns use the arithmetic EV.`;
             }
 
+            const getBaseDailyRate = (date) => {
+                if (activeMode === 'ev') return evRate;
+                if (returnBasis === 'daily') return pureReturn;
+                return pureReturn / (periodTradingDays[getPeriodKey(date, compoundFreq)] || 1);
+            };
 
-
-
-
+            const rand = mulberry32(simSeed);
+            const allDays = [];
             let principal = capital;
             let accumulatedPeriodGains = 0;
             let runningBalance = capital;
+            let totalWithdrawn = 0;
             let tradeIndex = 1;
 
-            currentSimDate = new Date(startDate);
-
-            // Loop until we pass the end of the timeline
-            while (true) {
-                const year = currentSimDate.getFullYear();
-                const month = currentSimDate.getMonth();
-                
-                const monthObj = monthsData.find(m => m.year === year && m.month === month);
-                if (!monthObj) {
-                    if (year > targetEndYear || (year === targetEndYear && month > targetEndMonth)) {
-                        break;
-                    }
-                    currentSimDate.setDate(currentSimDate.getDate() + 1);
-                    continue;
-                }
-
-                if (monthObj.days.length === 0) {
+            for (const currentSimDate = new Date(startDate); currentSimDate < simEnd; currentSimDate.setDate(currentSimDate.getDate() + 1)) {
+                // Days past the schedule end are only simulated for the headline projections
+                const monthObj = currentSimDate < endDate ? monthsByKey[`${currentSimDate.getFullYear()}-${currentSimDate.getMonth()}`] : null;
+                if (monthObj && monthObj.days.length === 0) {
                     monthObj.startBalance = runningBalance;
                 }
 
                 const isWknd = isWeekend(currentSimDate);
                 const isHol = isSgHoliday(currentSimDate);
-                const dayOfWeek = currentSimDate.getDay();
-                const isDowActive = activeDays[dayOfWeek];
-                const isExcluded = (excludeWeekends && isWknd) || (excludeHolidays && isHol) || !isDowActive;
+                const isExcluded = isExcludedDay(currentSimDate);
                 
                 let dailyDelta = 0;
+                let dailyWithdrawn = 0;
                 let isTradeDay = false;
                 let activeTradeNum = null;
                 let isRandomSkipped = false;
 
                 if (!isExcluded) {
-                    if (randomizeSkips && Math.random() > (randomProbability / 100)) {
+                    if (randomizeSkips && rand() > (randomProbability / 100)) {
                         isRandomSkipped = true;
                     }
 
                     if (!isRandomSkipped) {
                         isTradeDay = true;
                         activeTradeNum = tradeIndex++;
-                        monthObj.tradingDays++;
-                        let dailyRate = 0;
-                        if (activeMode === 'ev') {
-                            dailyRate = compoundRate;
-                        } else {
-                            const pureReturn = parseFloat(document.getElementById('pureReturn').value) || 0;
-                            if (returnBasis === 'daily') {
-                                dailyRate = pureReturn / 100;
-                            } else {
-                                const key = getPeriodKey(currentSimDate, compoundFreq);
-                                const totalDaysInPeriod = periodTradingDays[key] || 1;
-                                dailyRate = (pureReturn / 100) / totalDaysInPeriod;
-                            }
+
+                        let dailyRate = getBaseDailyRate(currentSimDate);
+                        if (useVariance) {
+                            dailyRate += -negVariance + rand() * (posVariance + negVariance);
                         }
 
                         if (compound) {
-                            let dailyCompoundRate = dailyRate;
-                            if (useVariance) {
-                                const offset = -negVariance + Math.random() * (posVariance + negVariance);
-                                dailyCompoundRate = dailyRate + offset;
+                            const tradeReturn = principal * dailyRate;
+                            if (tradeReturn > 0) {
+                                // Only profits are split between reinvesting and withdrawing
+                                dailyDelta = tradeReturn * (reinvestRate / 100);
+                                dailyWithdrawn = tradeReturn - dailyDelta;
+                            } else {
+                                // Losses always come out of the account in full, down to zero
+                                dailyDelta = Math.max(tradeReturn, -(principal + accumulatedPeriodGains));
                             }
-                            const tradeReturn = principal * dailyCompoundRate;
-                            const compoundedReturn = tradeReturn * (reinvestRate / 100);
-                            dailyDelta = compoundedReturn;
                             accumulatedPeriodGains += dailyDelta;
+                            totalWithdrawn += dailyWithdrawn;
                         } else {
-                            let dailyEvRate = dailyRate;
-                            if (useVariance) {
-                                const offset = -negVariance + Math.random() * (posVariance + negVariance);
-                                dailyEvRate = dailyRate + offset;
-                            }
-                            const dailyReturnDollars = capital * dailyEvRate;
-                            dailyDelta = dailyReturnDollars;
-                            runningBalance = runningBalance + dailyReturnDollars;
+                            dailyDelta = Math.max(capital * dailyRate, -runningBalance);
+                            runningBalance = runningBalance + dailyDelta;
                         }
-                    }
-                } else {
-                    if (excludeWeekends && isWknd) {
-                        monthObj.weekendsExcluded++;
-                    } else if (excludeHolidays && isHol) {
-                        monthObj.holidaysExcluded++;
                     }
                 }
 
@@ -1009,77 +1027,56 @@
                     runningBalance = principal + accumulatedPeriodGains;
                 }
 
-                monthObj.days.push({
+                const dayRecord = {
                     date: new Date(currentSimDate),
                     isTradeDay: isTradeDay,
                     isRandomSkipped: isRandomSkipped,
                     tradeNum: activeTradeNum,
-                    balanceBefore: runningBalance - dailyDelta,
                     balanceAfter: runningBalance,
-                    delta: dailyDelta
-                });
+                    delta: dailyDelta,
+                    withdrawn: dailyWithdrawn,
+                    totalWithdrawn: totalWithdrawn
+                };
+                allDays.push(dayRecord);
 
-                // Calculate next day date
+                // Roll accumulated gains into principal when the compounding period ends
                 const nextSimDate = new Date(currentSimDate);
                 nextSimDate.setDate(nextSimDate.getDate() + 1);
-
-                // Determine if a compounding period ends
-                let triggerCompounding = false;
-                if (compound) {
-                    if (compoundFreq === 'daily') {
-                        triggerCompounding = true;
-                    } else {
-                        // Check if next day crosses boundary or is simulation end
-                        const nextMonthObj = monthsData.find(m => m.year === nextSimDate.getFullYear() && m.month === nextSimDate.getMonth());
-                        const isSimEnd = !nextMonthObj && (nextSimDate.getFullYear() > targetEndYear || (nextSimDate.getFullYear() === targetEndYear && nextSimDate.getMonth() > targetEndMonth));
-                        
-                        if (isSimEnd) {
-                            triggerCompounding = true;
-                        } else if (compoundFreq === 'weekly') {
-                            if (nextSimDate.getDay() === 1 || nextSimDate.getDay() < currentSimDate.getDay()) {
-                                triggerCompounding = true;
-                            }
-                        } else if (compoundFreq === 'monthly') {
-                            if (nextSimDate.getMonth() !== currentSimDate.getMonth()) {
-                                triggerCompounding = true;
-                            }
-                        } else if (compoundFreq === 'quarterly') {
-                            if (nextSimDate.getMonth() !== currentSimDate.getMonth()) {
-                                const nextM = nextSimDate.getMonth();
-                                if (nextM === 0 || nextM === 3 || nextM === 6 || nextM === 9) {
-                                    triggerCompounding = true;
-                                }
-                            }
-                        } else if (compoundFreq === 'annually') {
-                            if (nextSimDate.getFullYear() !== currentSimDate.getFullYear()) {
-                                triggerCompounding = true;
-                            }
-                        }
-                    }
-                }
-
-                if (compound && triggerCompounding) {
+                if (compound && getPeriodKey(nextSimDate, compoundFreq) !== getPeriodKey(currentSimDate, compoundFreq)) {
                     principal = principal + accumulatedPeriodGains;
                     accumulatedPeriodGains = 0;
                     runningBalance = principal;
                 }
 
-                monthObj.endBalance = runningBalance;
-                monthObj.delta = monthObj.endBalance - monthObj.startBalance;
-
-                currentSimDate.setDate(currentSimDate.getDate() + 1);
+                if (monthObj) {
+                    monthObj.days.push(dayRecord);
+                    if (isTradeDay) {
+                        monthObj.tradingDays++;
+                    } else if (excludeWeekends && isWknd) {
+                        monthObj.weekendsExcluded++;
+                    } else if (excludeHolidays && isHol) {
+                        monthObj.holidaysExcluded++;
+                    }
+                    monthObj.withdrawn += dailyWithdrawn;
+                    monthObj.endBalance = runningBalance;
+                    monthObj.delta = monthObj.endBalance - monthObj.startBalance;
+                }
             }
 
-            // Calculate target dates
-            const date30 = new Date(startDate);
-            date30.setDate(date30.getDate() + 30);
-            
-            const date3m = new Date(startDate);
-            date3m.setMonth(date3m.getMonth() + 3);
-            
-            const date6m = new Date(startDate);
-            date6m.setMonth(date6m.getMonth() + 6);
-            
+            // Warn when the simulated range includes years without a gazetted holiday list
+            const holidayWarningEl = document.getElementById('holidayWarning');
+            const missingYears = [];
+            for (let y = startDate.getFullYear(); y <= lastSimDate.getFullYear(); y++) {
+                if (!holidaysBase[y]) missingYears.push(y);
+            }
+            if (excludeHolidays && missingYears.length > 0) {
+                const yearRange = missingYears.length > 1 ? `${missingYears[0]}-${missingYears[missingYears.length - 1]}` : `${missingYears[0]}`;
+                holidayWarningEl.textContent = `No official list for ${yearRange}: only fixed-date holidays and Good Friday are excluded.`;
+                holidayWarningEl.classList.remove('hidden');
+            } else {
+                holidayWarningEl.classList.add('hidden');
+            }
+
             const formatDateShort = (d) => d.toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' });
             
             const pDate1 = document.getElementById('projDate1');
@@ -1089,53 +1086,32 @@
             if (pDate2) pDate2.textContent = formatDateShort(date3m);
             if (pDate3) pDate3.textContent = formatDateShort(date6m);
 
-            // Calculate 30-day, 3-month, 6-month projections based on simulation calendar
-            const allDays = [];
-            monthsData.forEach(m => allDays.push(...m.days));
-
-            const formatDateKey = (d) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-            
-            const key30 = formatDateKey(date30);
-            const key3m = formatDateKey(date3m);
-            const key6m = formatDateKey(date6m);
-            
-            const day30 = allDays.find(d => formatDateKey(d.date) === key30);
-            const day3m = allDays.find(d => formatDateKey(d.date) === key3m);
-            const day6m = allDays.find(d => formatDateKey(d.date) === key6m);
-            
-            let bal30 = day30 ? day30.balanceAfter : (allDays.length > 0 ? allDays[allDays.length - 1].balanceAfter : capital);
-            let bal3m = day3m ? day3m.balanceAfter : capital;
-            let bal6m = day6m ? day6m.balanceAfter : capital;
-
-            // Fallback projection calculations for short simulated durations
-            const totalDaysSimulated = allDays.length || 1;
-            if (allDays.length > 0 && capital > 0) {
-                const simFinalBal = allDays[allDays.length - 1].balanceAfter;
-                const avgDailyRate = Math.pow(simFinalBal / capital, 1 / totalDaysSimulated) - 1;
-                
-                if (!day3m) {
-                    const daysTo3m = Math.round((date3m - startDate) / (1000 * 60 * 60 * 24));
-                    bal3m = capital * Math.pow(1 + avgDailyRate, daysTo3m);
+            // Balance (and cash withdrawn so far) at the start of a target date
+            const balanceAt = (target) => {
+                let balance = capital;
+                let withdrawn = 0;
+                for (const d of allDays) {
+                    if (d.date >= target) break;
+                    balance = d.balanceAfter;
+                    withdrawn = d.totalWithdrawn;
                 }
-                if (!day6m) {
-                    const daysTo6m = Math.round((date6m - startDate) / (1000 * 60 * 60 * 24));
-                    bal6m = capital * Math.pow(1 + avgDailyRate, daysTo6m);
-                }
-            }
+                return { balance, withdrawn };
+            };
 
             // Render Projection Grid
             const projs = [
-                { id: 1, val: bal30 },
-                { id: 2, val: bal3m },
-                { id: 3, val: bal6m }
+                { id: 1, ...balanceAt(date30) },
+                { id: 2, ...balanceAt(date3m) },
+                { id: 3, ...balanceAt(date6m) }
             ];
             
             projs.forEach(p => {
-                const finalBal = p.val;
-                const totalDeltaPct = ((finalBal - capital) / capital) * 100;
+                const finalBal = p.balance;
+                const totalDeltaPct = capital > 0 ? ((finalBal - capital) / capital) * 100 : 0;
                 
                 const projValEl = document.getElementById(`proj${p.id}`);
                 const projDeltaEl = document.getElementById(`projDelta${p.id}`);
+                const projWithdrawnEl = document.getElementById(`projWithdrawn${p.id}`);
                 if (projValEl && projDeltaEl) {
                     projValEl.textContent = formatUSD(finalBal);
                     projDeltaEl.textContent = formatPercent(totalDeltaPct);
@@ -1145,6 +1121,10 @@
                     } else {
                         projDeltaEl.className = "text-[11px] text-lossRed font-semibold block mt-0.5";
                     }
+                }
+                if (projWithdrawnEl) {
+                    projWithdrawnEl.textContent = `${formatUSD(p.withdrawn)} withdrawn`;
+                    projWithdrawnEl.classList.toggle('hidden', p.withdrawn < 0.005);
                 }
             });
 
@@ -1187,6 +1167,7 @@
                             <div class="text-[11px] font-bold ${deltaClass}">
                                 ${m.delta >= 0 ? '+' : ''}${formatUSD(m.delta)} (${formatPercent(deltaPct)})
                             </div>
+                            ${m.withdrawn >= 0.005 ? `<div class="text-[10px] font-semibold text-amber-400">${formatUSD(m.withdrawn)} withdrawn</div>` : ''}
                         </div>
                         <svg class="w-4 h-4 text-gray-500 transform transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
@@ -1210,6 +1191,9 @@
                             statusText = `T#${d.tradeNum}`;
                             statusClass = "text-accentBlue font-bold bg-blue-500/10 px-1.5 py-0.5 rounded";
                             valStr = formatUSD(d.delta);
+                            if (d.withdrawn >= 0.005) {
+                                valStr += ` <span class="text-amber-400">(+${formatUSD(d.withdrawn)} out)</span>`;
+                            }
                             valClass = d.delta >= 0 ? "text-emerald-400 font-semibold" : "text-lossRed font-semibold";
                         } else if (d.isRandomSkipped) {
                             statusText = "Skipped (Rand)";
@@ -1313,7 +1297,12 @@
             calculate();
         });
 
-        document.getElementById('excludeWeekends').addEventListener('change', () => {
+        document.getElementById('excludeWeekends').addEventListener('change', (e) => {
+            // Including weekends makes Sat/Sun tradeable; they can still be deselected individually
+            if (!e.target.checked) {
+                activeDays[6] = true;
+                activeDays[0] = true;
+            }
             updateDowButtonsUI();
             calculate();
         });
